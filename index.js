@@ -2,10 +2,11 @@ const fs = require('fs');
 const express = require('express');
 const path = require('path');
 const app = express();
-const port = 3001;
 
 // Download file from /file
-app.get('/:filename', (req, res) => {
+app.get('/:filename', (req, res, next) => {
+  // ป้องกันทับ route /ls หรือ /
+  if (req.params.filename === 'ls') return next();
   const filename = req.params.filename;
   const filePath = path.join(__dirname, 'assets', filename);
 
@@ -39,10 +40,5 @@ app.get('/', (req, res) => {
   res.send("Hello, World! Please enter the correct file name in the url");
 });
 
-// Start server
-app.listen(port, '0.0.0.0', () => {
-  console.log(`Server is running at http://0.0.0.0:${port}`);
-});
-
-// Export app for deployment (e.g. Vercel)
+// Export handler for Vercel
 module.exports = app;
